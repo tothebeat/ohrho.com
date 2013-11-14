@@ -17,7 +17,10 @@ TRANSLATION_FEED_ATOM = None
 
 # Blogroll
 LINKS =  (('Hacker News', 'http://news.ycombinator.com/'),
-        ('lobste.rs', 'http://lobste.rs/'),)
+        ('lobste.rs', 'http://lobste.rs/'),
+        ('Joel Spolsky', 'http://joelonsoftware.com'),
+        ('Derek Sivers', 'http://sivers.org/'),
+        )
 
 # Social widget
 SOCIAL = (('my linkedin', 'https://linkedin.com/in/nicholasrrbennett/'),
