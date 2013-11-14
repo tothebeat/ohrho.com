@@ -20,6 +20,7 @@ LINKS =  (('Hacker News', 'http://news.ycombinator.com/'),
         ('lobste.rs', 'http://lobste.rs/'),
         ('Joel Spolsky', 'http://joelonsoftware.com'),
         ('Derek Sivers', 'http://sivers.org/'),
+        ('Pelican Themes', 'http://pelicanthemes.com/'),
         )
 
 # Social widget
