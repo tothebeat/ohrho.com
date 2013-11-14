@@ -15,7 +15,7 @@ Summary: A growing list of my favorite modules/libraries for Python.
 * [re](http://docs.python.org/2/library/re.html) - You can't avoid using this. Like it.
 * [collections](http://docs.python.org/2/library/collections.html#collections.defaultdict) - Just for `defaultdict`. `d = defaultdict(lambda: [])` is just beautiful. 
 * [ipython](http://ipython.org/) - Nothing beats this shell.
-* [selenium](http://www.realpython.com/blog/python/headless-selenium-testing-with-python-and-phantomjs/#.UoRfeh8TDZg) - This makes scraping easy.
+* [selenium](http://www.seleniumhq.org/) - This makes [scraping](http://www.realpython.com/blog/python/headless-selenium-testing-with-python-and-phantomjs/#.UoRfeh8TDZg) easy.
 * [sqlalchemy](http://www.sqlalchemy.org/) - I've barely scratched the surface with this, or even used it properly, but it has helped me vastly reduce the complexity of using a SQL database in the past.
 * [xlrd/xlwt](http://www.python-excel.org/) - Two modules for reading and writing Excel files, respectively. These can handle '.xls' files from Office 2003 and earlier, along with '.xlsx' files from Office 2007 and newer.
 * [pelican](http://docs.getpelican.com/en/3.3.0/) - I have to represent for what created this blog. 
