@@ -1,0 +1,494 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom"><title>ohrho</title><link href="http://ohrho.com/" rel="alternate"></link><link href="http://ohrho.com/feeds/all.atom.xml" rel="self"></link><id>http://ohrho.com/</id><updated>2013-11-19T22:21:00-06:00</updated><entry><title>Install Gerrit Code Review</title><link href="http://ohrho.com/installing-gerrit-code-review.html" rel="alternate"></link><updated>2013-11-19T22:21:00-06:00</updated><author><name>Nick Bennett</name></author><id>tag:ohrho.com,2013-11-19:installing-gerrit-code-review.html</id><summary type="html">&lt;p&gt;For the uninitiated, &lt;a href="https://code.google.com/p/gerrit/"&gt;Gerrit Code Review&lt;/a&gt; is a &lt;a href="http://en.wikipedia.org/wiki/Software_code_review"&gt;code review system&lt;/a&gt; used by some major projects like &lt;a href="http://review.cyanogenmod.org"&gt;cyanogenmod&lt;/a&gt;, &lt;a href="https://android-review.googlesource.com"&gt;android&lt;/a&gt;, and &lt;a href="https://review.openstack.org"&gt;openstack&lt;/a&gt;. It can be integrated nicely with &lt;a href="http://git-scm.com/book/ch4-6.html"&gt;gitweb&lt;/a&gt;, a simple but reliable web interface for browsing your git repositories. &lt;/p&gt;
+&lt;p&gt;Gerrit Code Review has documentation, but I found that it was difficult to understand if I wanted to do anything that wasn't default. Below are the notes I took while installing and configuring it at work. I hope that this can be of some use to others.&lt;/p&gt;
+&lt;h3&gt;Installing Gerrit&lt;/h3&gt;
+&lt;p&gt;&lt;a href="http://gerrit-documentation.googlecode.com/svn/Documentation/2.6/install-quick.html"&gt;Installation Docs&lt;/a&gt;&lt;/p&gt;
+&lt;h4&gt;Check Java&lt;/h4&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;CT-111-bash-4.1# java -version
+java version &lt;span class="s2"&gt;&amp;quot;1.7.0_21&amp;quot;&lt;/span&gt;
+Java&lt;span class="o"&gt;(&lt;/span&gt;TM&lt;span class="o"&gt;)&lt;/span&gt; SE Runtime Environment &lt;span class="o"&gt;(&lt;/span&gt;build 1.7.0_21-b11&lt;span class="o"&gt;)&lt;/span&gt;
+Java HotSpot&lt;span class="o"&gt;(&lt;/span&gt;TM&lt;span class="o"&gt;)&lt;/span&gt; 64-Bit Server VM &lt;span class="o"&gt;(&lt;/span&gt;build 23.21-b01, mixed mode&lt;span class="o"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h4&gt;Create user and login&lt;/h4&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;adduser gerrit2
+sudo su gerrit2
+&lt;span class="nb"&gt;cd&lt;/span&gt; ~
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h4&gt;Get Gerrit&lt;/h4&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;wget http://gerrit-releases.storage.googleapis.com/gerrit-2.6.war
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h4&gt;Initialize &amp;amp; Start Gerrit Site&lt;/h4&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;java -jar gerrit-2.6.war init --batch -d ~/gerrit_sneakysnakes
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h4&gt;Add Gerrit Daemon to Startup&lt;/h4&gt;
+&lt;p&gt;Make a symlink of the script in rc3.d:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;CT-111-bash-4.1# sudo ln -snf /home/gerrit2/gerrit_sneakysnakes/bin/gerrit.sh /etc/init.d/gerrit
+CT-111-bash-4.1# sudo ln -snf /etc/init.d/gerrit /etc/rc3.d/S90gerrit
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Set the GERRIT_SITE environment variable in &lt;code&gt;/etc/default/gerritcodereview&lt;/code&gt;:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="n"&gt;GERRIT_SITE&lt;/span&gt;&lt;span class="o"&gt;=/&lt;/span&gt;&lt;span class="n"&gt;home&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;gerrit2&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;gerrit_sneakysnakes&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h4&gt;Configure Gerrit to run through reverse proxy&lt;/h4&gt;
+&lt;p&gt;Edit &lt;code&gt;/home/gerrit2/gerrit_sneakysnakes/etc/gerrit.config&lt;/code&gt;, change:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="n"&gt;canonicalWebUrl&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;http&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="c1"&gt;//gerrit.sneakysnakes.com:8080/&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;to:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="n"&gt;canonicalWebUrl&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;http&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="c1"&gt;//gerrit.sneakysnakes.com/&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;and change:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="n"&gt;listenUrl&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;http&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="c1"&gt;//*:8080/&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;to:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="n"&gt;listenUrl&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;proxy&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;http&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="c1"&gt;//127.0.0.1:8080/&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Edit &lt;code&gt;/etc/httpd/conf.d/gerrit.conf&lt;/code&gt; and confirm it contains the following:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="nt"&gt;&amp;lt;VirtualHost&lt;/span&gt; &lt;span class="err"&gt;173.199.152.62:80&lt;/span&gt;&lt;span class="nt"&gt;&amp;gt;&lt;/span&gt;
+  ServerName 173.199.152.62
+
+  ProxyRequests Off
+  ProxyVia Off
+  ProxyPreserveHost On
+
+  &lt;span class="nt"&gt;&amp;lt;Proxy&lt;/span&gt; &lt;span class="err"&gt;*&lt;/span&gt;&lt;span class="nt"&gt;&amp;gt;&lt;/span&gt;
+    Order deny,allow
+    Allow from all
+  &lt;span class="nt"&gt;&amp;lt;/Proxy&amp;gt;&lt;/span&gt;
+
+  &lt;span class="nt"&gt;&amp;lt;Location&lt;/span&gt; &lt;span class="nt"&gt;/&amp;gt;&lt;/span&gt;
+    AuthType Basic
+    AuthName &amp;quot;Gerrit Code Review&amp;quot;
+    Require valid-user
+    AuthUserFile /etc/httpd/htpasswds/gerrit
+  &lt;span class="nt"&gt;&amp;lt;/Location&amp;gt;&lt;/span&gt;
+
+  AllowEncodedSlashes On
+  ProxyPass / http://127.0.0.1:8080/ nocanon
+&lt;span class="nt"&gt;&amp;lt;/VirtualHost&amp;gt;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;(according to &lt;a href="https://gerrit-review.googlesource.com/Documentation/config-reverseproxy.html"&gt;setup instructions&lt;/a&gt;, the two options &lt;code&gt;AllowEncodedSlashes On&lt;/code&gt; and &lt;code&gt;ProxyPass .. nocanon&lt;/code&gt; are required since Gerrit 2.6.)&lt;/p&gt;
+&lt;h4&gt;Add HTTP auth&lt;/h4&gt;
+&lt;p&gt;Generate HTTP auth accounts for everyone:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;CT-111-bash-4.1# htpasswd /etc/httpd/htpasswds/gerrit admin
+CT-111-bash-4.1# htpasswd /etc/httpd/htpasswds/gerrit nbennett
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Enable HTTP auth pass-through for Gerrit:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;CT-111-bash-4.1# git config --file /home/gerrit2/gerrit_sneakysnakes/etc/gerrit.config auth.type HTTP
+CT-111-bash-4.1# git config --file /home/gerrit2/gerrit_sneakysnakes/etc/gerrit.config --unset auth.httpHeader
+CT-111-bash-4.1# git config --file /home/gerrit2/gerrit_sneakysnakes/etc/gerrit.config auth.emailFormat &lt;span class="s1"&gt;&amp;#39;{0}@sneakysnakes.com&amp;#39;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h4&gt;Apply Changes&lt;/h4&gt;
+&lt;p&gt;Restart Gerrit:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;CT-111-bash-4.1# /home/gerrit2/gerrit_sneakysnakes/bin/gerrit.sh restart
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Restart Apache:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;CT-111-bash-4.1# /etc/init.d/httpd restart
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h4&gt;Installing and Configuring Firewall&lt;/h4&gt;
+&lt;p&gt;Modify &lt;code&gt;/etc/csf/csf.conf&lt;/code&gt; to add port 29418 (Gerrit) to the TCP_IN list:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="cp"&gt;# Allow incoming TCP ports&lt;/span&gt;
+&lt;span class="n"&gt;TCP_IN&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;20,21,22,25,26,53,80,110,143,443,465,587,993,995,2077,2078,2082,2083,2086,2087,2095,2096,9100,9200,29418,30000:35000&amp;quot;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Restart CSF:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;CT-111-bash-4.1# service csf restart
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h4&gt;Create Admin&lt;/h4&gt;
+&lt;p&gt;The first user to log in to a new installation will automatically be set as the admin. Log in to http://gerrit.sneakysnakes.com/ for the first time with the admin account created earlier. Subsequent logins will create ordinary Registered User accounts. &lt;/p&gt;
+&lt;p&gt;To switch users once logged in as admin, prepend &lt;code&gt;logout@&lt;/code&gt; to the url, i.e. go to http://logout@gerrit.sneakysnakes.com/.&lt;/p&gt;
+&lt;h4&gt;Set Permissions&lt;/h4&gt;
+&lt;p&gt;Access Control is configured through the All-Projects settings. Log in to http://gerrit.sneakysnakes.com/ as admin. Go to Projects-&amp;gt;List in the upper left corner, and click on All-Projects. Click the &lt;code&gt;Edit&lt;/code&gt; button to make changes. (refs: &lt;a href="http://gerrit.sneakysnakes.com/Documentation/access-control.html"&gt;Access Control&lt;/a&gt; &lt;a href="http://gerrit.sneakysnakes.com/Documentation/config-labels.html"&gt;Config Labels&lt;/a&gt;)&lt;/p&gt;
+&lt;h5&gt;Push Existing Repos without Code Review&lt;/h5&gt;
+&lt;p&gt;In order to push an existing project into Gerrit without requiring every existing commit to be reviewed, a few flags need to  be set on the project. The easiest way to do this is to change the All-Projects template, set these flags for the Administrators group, and then simply add yourself to the Administrators group if you're going to be pushing an existing project. &lt;/p&gt;
+&lt;p&gt;Under the section marked by &lt;code&gt;Reference: refs/heads/*&lt;/code&gt;, you will find the previously mentioned flags. The Administrators group should already have these flags enabled.&lt;/p&gt;
+&lt;p&gt;To bypass review, push to refs/heads/master instead of refs/for/master (see &lt;a href="http://gerrit.sneakysnakes.com/Documentation/user-upload.html#bypass_review"&gt;this&lt;/a&gt;).&lt;/p&gt;
+&lt;h4&gt;Set default Code-Review range to (-2,+2&lt;/h4&gt;
+&lt;p&gt;Under the section marked by &lt;code&gt;Reference: refs/heads/*&lt;/code&gt;, look for &lt;code&gt;Label Code-Review&lt;/code&gt;. By default, just the groups &lt;code&gt;Administrators&lt;/code&gt; and &lt;code&gt;Project Owners&lt;/code&gt; can use -2 and +2 ratings, and the &lt;code&gt;Registered Users&lt;/code&gt; group is limited to -1, 0, and +1. Change the min and max ratings usable by &lt;code&gt;Registered Users&lt;/code&gt; to -2 and +2.&lt;/p&gt;
+&lt;h5&gt;Allow gitweb Read Access&lt;/h5&gt;
+&lt;p&gt;In the All-Projects settings, under the "'''Reference:''' refs/meta/config" section, with respect to the ''Read'' permission, add the '''Registered Users''' group.&lt;/p&gt;
+&lt;h3&gt;Using Gerrit&lt;/h3&gt;
+&lt;h4&gt;Set your account password&lt;/h4&gt;
+&lt;p&gt;Log in to the Gerrit server via the node, spacecadet. You can find the container ID for gerrit.sneakysnakes.com:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="n"&gt;root&lt;/span&gt;&lt;span class="err"&gt;@&lt;/span&gt;&lt;span class="n"&gt;spacecadet&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;1681&lt;/span&gt; &lt;span class="mi"&gt;11&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="mi"&gt;23&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="mi"&gt;52&lt;/span&gt; &lt;span class="o"&gt;~&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt; &lt;span class="n"&gt;vzlist&lt;/span&gt;
+      &lt;span class="n"&gt;CTID&lt;/span&gt;      &lt;span class="n"&gt;NPROC&lt;/span&gt; &lt;span class="n"&gt;STATUS&lt;/span&gt;       &lt;span class="n"&gt;IP_ADDR&lt;/span&gt;         &lt;span class="n"&gt;HOSTNAME&lt;/span&gt;
+
+       &lt;span class="mi"&gt;111&lt;/span&gt;         &lt;span class="mi"&gt;11&lt;/span&gt; &lt;span class="n"&gt;running&lt;/span&gt;      &lt;span class="mf"&gt;123.123.123.123&lt;/span&gt;  &lt;span class="n"&gt;gerrit&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;sneakysnakes&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;com&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Enter the server with:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;root@spacecadet &lt;span class="o"&gt;[&lt;/span&gt;1682 11:24:08 ~&lt;span class="o"&gt;]&lt;/span&gt;&lt;span class="nv"&gt;$ &lt;/span&gt;vzctl enter 111
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Your HTTP auth username should be the name stub of your sneakysnakes email address. My email address is nbennett@sneakysnakes.com, so my username will be &lt;code&gt;nbennett&lt;/code&gt;. Set your htpasswd this way:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;CT-111-bash-4.1# htpasswd /etc/httpd/htpasswds/gerrit nbennett
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h4&gt;Add RSA public key to your Gerrit account&lt;/h4&gt;
+&lt;p&gt;Add the contents of your ~/.ssh/id_rsa.pub file to the SSH public keys options in your user account settings on the Gerrit site. Click on your name in the upper-right corner of the page, click on Settings, and then click on SSH Public Keys. &lt;/p&gt;
+&lt;h4&gt;Add Gerrit commit hook script to automatically add Change-Id to commit messages&lt;/h4&gt;
+&lt;p&gt;In the root of the repo from which you will be making commits, retrieve the Gerrit script that will automatically add a Change-Id to all future commits (change nbennett to your username) (&lt;a href="http://stackoverflow.com/questions/8845658/gerrit-error-when-change-id-in-commit-messages-are-missing"&gt;ref&lt;/a&gt;):&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;scp -p -P 29418 nbennett@gerrit.sneakysnakes.com:hooks/commit-msg .git/hooks/
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h4&gt;Adding git remote for Gerrit&lt;/h4&gt;
+&lt;p&gt;Instead of laboriously typing in the full path every time to Gerrit and having to remember the arcane port number, you can add a git remote alias for gerrit:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;git remote add gerrit ssh://nbennett@gerrit.sneakysnakes.com:29418/arbor/arbor
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;This adds the following text to the .git/config file in your repository:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="k"&gt;[remote &amp;quot;gerrit&amp;quot;]&lt;/span&gt;
+        &lt;span class="na"&gt;url&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;ssh://nbennett@gerrit.sneakysnakes.com:29418/arbor/arbor&lt;/span&gt;
+&lt;span class="s"&gt;        fetch = +refs/heads/*:refs/remotes/gerrit/*&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;You can then push changes simply with:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;git push gerrit HEAD:refs/for/master
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h4&gt;Add existing git repo to Gerrit&lt;/h4&gt;
+&lt;ol&gt;
+&lt;li&gt;Add yourself to the Administrators group. &lt;ol&gt;
+&lt;li&gt;Log in to http://gerrit.sneakysnakes.com/ as admin (you may need to log out first with http://logout@gerrit.sneakysnakes.com/). &lt;/li&gt;
+&lt;li&gt;Click on People in the upper left, then click on List Groups. Click on the Administrators group.&lt;/li&gt;
+&lt;li&gt;Type your username in the Members text field and click Add. NOTE: You must have logged in at least once before to have the account created and available for adding.&lt;/li&gt;
+&lt;li&gt;Log out of gerrit and log back in as yourself.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;li&gt;Create a new project on Gerrit&lt;ol&gt;
+&lt;li&gt;From the command line:&lt;code&gt;ssh -p 29418 nbennett@gerrit.sneakysnakes.com gerrit create-project --name arbor/arbor&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;Go to http://gerrit.sneakysnakes.com/ and click on Projects in the upper left corner, and then on List. Click on the new project you just created. Then click on Access, to the right of the Projects-&amp;gt;List option. &lt;/li&gt;
+&lt;li&gt;Click the Edit button, and then click the Add Reference link. Leave the default Reference as "refs/heads/*". From the drop-down menu, pick "Create Reference". For the group name, type "Administrators" and then click the Add button to the right. Repeat this, choosing "Forge Committer Identity" and "Forge Author Identity" from the drop-down menu and adding Administrators for each one. When finished, click the "Save Changes" button at the bottom. (&lt;a href="http://stackoverflow.com/questions/8353988/how-to-upload-a-git-repo-to-gerrit"&gt;ref&lt;/a&gt;)&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;li&gt;Push your repo&lt;ol&gt;
+&lt;li&gt;In the command line, in the root of your repo, run (&lt;a href="http://en.wikibooks.org/wiki/Git/Gerrit_Code_Review#Importing_project_into_Gerrit"&gt;ref&lt;/a&gt;): &lt;code&gt;git push ssh://nbennett@gerrit.sneakysnakes.com:29418/arbor/arbor HEAD:refs/heads/master&lt;/code&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;li&gt;Remove yourself from the Administrators group&lt;ol&gt;
+&lt;li&gt;Log out of Gerrit with http://logout@gerrit.sneakysnakes.com/, log in as admin.&lt;/li&gt;
+&lt;li&gt;Following the steps you used previously to add yourself to the Administrators group, get to the point where you would have typed in your username to the Members text field. Your name is listed below. Check the box next to your name and click the Delete button. &lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;li&gt;Log out of Gerrit and log back in as yourself.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h4&gt;Pushing changes to be reviewed&lt;/h4&gt;
+&lt;p&gt;With your commits created with the Gerrit Change-Id hook script already installed, you're ready to push to Gerrit to have your changes reviewed:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="n"&gt;git&lt;/span&gt; &lt;span class="n"&gt;push&lt;/span&gt; &lt;span class="n"&gt;ssh&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="c1"&gt;//nbennett@gerrit.sneakysnakes.com:29418/arbor/arbor HEAD:refs/for/master&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h4&gt;To give a project the Verified label&lt;/h4&gt;
+&lt;p&gt;See: http://gerrit-documentation.googlecode.com/svn/Documentation/2.6/config-labels.html#label_Verified&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Clone the project repository&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;git fetch origin refs/meta/config&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;git checkout FETCH_HEAD&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;vi project.config&lt;/code&gt;&lt;br /&gt;
+ Add:&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt; &lt;span class="cp"&gt;[&lt;/span&gt;&lt;span class="nb"&gt;label&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;Verified&amp;quot;&lt;/span&gt;&lt;span class="cp"&gt;]&lt;/span&gt;
+     &lt;span class="kd"&gt;function&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nx"&gt;MaxWithBlock&lt;/span&gt;
+     &lt;span class="nx"&gt;value&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt; &lt;span class="nx"&gt;Fails&lt;/span&gt;
+     &lt;span class="nx"&gt;value&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt;  &lt;span class="mi"&gt;0&lt;/span&gt; &lt;span class="nx"&gt;No&lt;/span&gt; &lt;span class="nx"&gt;score&lt;/span&gt;
+     &lt;span class="nx"&gt;value&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt; &lt;span class="nx"&gt;Verified&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;git add --all&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;git commit -m "Add Verified label."&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;git push origin HEAD:refs/meta/config&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;Make sure the project gives Non-Interactive Users (aka, buildbot) the ability to use the Verify label.&lt;/li&gt;
+&lt;li&gt;Make sure the user that will use Verify has the permissions.&lt;/li&gt;
+&lt;li&gt;(May have to restart the gerrit server?)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Note: The buildbot source code has been slightly modified in pythonenv/lib/python2.6/site-packages/buildbot/status/status_gerrit.py to support this new --label syntax as the current stable version (0.8.7p1) doesn't support it:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt; &lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;command&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;extend&lt;/span&gt;&lt;span class="p"&gt;([&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;--verified %d&amp;quot;&lt;/span&gt; &lt;span class="o"&gt;%&lt;/span&gt; &lt;span class="kt"&gt;int&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;verified&lt;/span&gt;&lt;span class="p"&gt;)])&lt;/span&gt;
+ &lt;span class="o"&gt;+&lt;/span&gt;&lt;span class="n"&gt;command&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;extend&lt;/span&gt;&lt;span class="p"&gt;([&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;--label Verified=%d&amp;quot;&lt;/span&gt; &lt;span class="o"&gt;%&lt;/span&gt; &lt;span class="kt"&gt;int&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;verified&lt;/span&gt;&lt;span class="p"&gt;)])&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h4&gt;Further Help&lt;/h4&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href="http://gerrit.sneakysnakes.com/Documentation/intro-quick.html"&gt;Quick Introduction&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="https://wiki.openstack.org/wiki/Gerrit_Workflow"&gt;Gerrit Workflow for OpenStack&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;</summary><category term="python"></category></entry><entry><title>notes from work</title><link href="http://ohrho.com/notes-from-beginning-developer.html" rel="alternate"></link><updated>2013-11-19T21:56:00-06:00</updated><author><name>Nick Bennett</name></author><id>tag:ohrho.com,2013-11-19:notes-from-beginning-developer.html</id><summary type="html">&lt;p&gt;Below is a set of notes I created at work for what I learned and needed to know from the first 4 months of my job. It's all ingrained in my head by now so I rarely look at the page anymore. Perhaps someone out there in Web Land could use it.&lt;/p&gt;
+&lt;h3&gt;~/.screenrc&lt;/h3&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="n"&gt;term&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;screen-256color&amp;quot;&lt;/span&gt;
+&lt;span class="n"&gt;startup_message&lt;/span&gt; &lt;span class="n"&gt;off&lt;/span&gt;
+&lt;span class="n"&gt;caption&lt;/span&gt; &lt;span class="n"&gt;string&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;%?%F%{= Bk}%? %C%A %D %d-%m-%Y %{= kB} %t%= %?%F%{= Bk}%:%{= wk}%? %n &amp;quot;&lt;/span&gt;
+&lt;span class="n"&gt;hardstatus&lt;/span&gt; &lt;span class="n"&gt;alwayslastline&lt;/span&gt;
+&lt;span class="n"&gt;hardstatus&lt;/span&gt; &lt;span class="n"&gt;string&lt;/span&gt; &lt;span class="err"&gt;&amp;#39;&lt;/span&gt;&lt;span class="o"&gt;%&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;kG&lt;/span&gt;&lt;span class="p"&gt;}[&lt;/span&gt; &lt;span class="o"&gt;%&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="n"&gt;G&lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="o"&gt;%&lt;/span&gt;&lt;span class="n"&gt;H&lt;/span&gt; &lt;span class="o"&gt;%&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="n"&gt;g&lt;/span&gt;&lt;span class="p"&gt;}][&lt;/span&gt;&lt;span class="o"&gt;%=&lt;/span&gt; &lt;span class="o"&gt;%&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;kw&lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="o"&gt;%?%-&lt;/span&gt;&lt;span class="n"&gt;Lw&lt;/span&gt;&lt;span class="o"&gt;%?%&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="n"&gt;r&lt;/span&gt;&lt;span class="p"&gt;}(&lt;/span&gt;&lt;span class="o"&gt;%&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="n"&gt;W&lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="o"&gt;%&lt;/span&gt;&lt;span class="n"&gt;n&lt;/span&gt;&lt;span class="o"&gt;*%&lt;/span&gt;&lt;span class="n"&gt;f&lt;/span&gt;&lt;span class="o"&gt;%&lt;/span&gt;&lt;span class="n"&gt;t&lt;/span&gt;&lt;span class="o"&gt;%?&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="o"&gt;%&lt;/span&gt;&lt;span class="n"&gt;u&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="o"&gt;%?%&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="n"&gt;r&lt;/span&gt;&lt;span class="p"&gt;})&lt;/span&gt;&lt;span class="o"&gt;%&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="n"&gt;w&lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="o"&gt;%?%+&lt;/span&gt;&lt;span class="n"&gt;Lw&lt;/span&gt;&lt;span class="o"&gt;%?%?%=&lt;/span&gt; &lt;span class="o"&gt;%&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="n"&gt;g&lt;/span&gt;&lt;span class="p"&gt;}][&lt;/span&gt;&lt;span class="o"&gt;%&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="n"&gt;B&lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt; &lt;span class="o"&gt;%&lt;/span&gt;&lt;span class="n"&gt;d&lt;/span&gt;&lt;span class="o"&gt;/%&lt;/span&gt;&lt;span class="n"&gt;m&lt;/span&gt; &lt;span class="o"&gt;%&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="n"&gt;W&lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="o"&gt;%&lt;/span&gt;&lt;span class="n"&gt;c&lt;/span&gt; &lt;span class="o"&gt;%&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="n"&gt;g&lt;/span&gt;&lt;span class="p"&gt;}]&lt;/span&gt;&lt;span class="err"&gt;&amp;#39;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h3&gt;~/.bashrc&lt;/h3&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="c1"&gt;# .bashrc&lt;/span&gt;
+
+&lt;span class="s-Atom"&gt;#&lt;/span&gt; &lt;span class="nv"&gt;Function&lt;/span&gt; &lt;span class="s-Atom"&gt;for&lt;/span&gt; &lt;span class="s-Atom"&gt;randomized&lt;/span&gt; &lt;span class="s-Atom"&gt;password&lt;/span&gt;
+&lt;span class="nf"&gt;randpw&lt;/span&gt;&lt;span class="p"&gt;(){&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&lt;/span&gt; &lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="s-Atom"&gt;dev&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="s-Atom"&gt;urandom&lt;/span&gt; &lt;span class="s-Atom"&gt;tr&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="s-Atom"&gt;dc&lt;/span&gt; &lt;span class="k"&gt;_&lt;/span&gt;&lt;span class="nv"&gt;A&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="nv"&gt;Z&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="s-Atom"&gt;a&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="s-Atom"&gt;z&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="m"&gt;0&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="m"&gt;9&lt;/span&gt; &lt;span class="p"&gt;|&lt;/span&gt; &lt;span class="s-Atom"&gt;head&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="s-Atom"&gt;c$&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="m"&gt;1&lt;/span&gt;&lt;span class="p"&gt;:-&lt;/span&gt;&lt;span class="m"&gt;16&lt;/span&gt;&lt;span class="p"&gt;};&lt;/span&gt;&lt;span class="s-Atom"&gt;echo&lt;/span&gt;&lt;span class="p"&gt;;}&lt;/span&gt;
+
+&lt;span class="s-Atom"&gt;#&lt;/span&gt; &lt;span class="nv"&gt;Source&lt;/span&gt; &lt;span class="s-Atom"&gt;global&lt;/span&gt; &lt;span class="s-Atom"&gt;definitions&lt;/span&gt;
+&lt;span class="s-Atom"&gt;if&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="s-Atom"&gt;f&lt;/span&gt; &lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="s-Atom"&gt;etc&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="s-Atom"&gt;bashrc&lt;/span&gt; &lt;span class="p"&gt;];&lt;/span&gt; &lt;span class="s-Atom"&gt;then&lt;/span&gt;
+        &lt;span class="p"&gt;.&lt;/span&gt; &lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="s-Atom"&gt;etc&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="s-Atom"&gt;bashrc&lt;/span&gt;
+&lt;span class="s-Atom"&gt;fi&lt;/span&gt;
+&lt;span class="s-Atom"&gt;alias&lt;/span&gt; &lt;span class="s-Atom"&gt;spotify=&amp;#39;~/bin/my-spotify 2&amp;gt; /dev/null &amp;amp;&amp;#39;&lt;/span&gt;
+
+&lt;span class="s-Atom"&gt;export&lt;/span&gt; &lt;span class="nv"&gt;WORKON_HOME&lt;/span&gt;&lt;span class="s-Atom"&gt;=&lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="nv"&gt;HOME&lt;/span&gt;&lt;span class="s-Atom"&gt;/.virtualenvs&lt;/span&gt;
+&lt;span class="s-Atom"&gt;export&lt;/span&gt; &lt;span class="nv"&gt;PROJECT_HOME&lt;/span&gt;&lt;span class="s-Atom"&gt;=&lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="nv"&gt;HOME&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="nv"&gt;Devel&lt;/span&gt;
+&lt;span class="s-Atom"&gt;source&lt;/span&gt; &lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="s-Atom"&gt;usr&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="s-Atom"&gt;bin&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="s-Atom"&gt;virtualenvwrapper&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="s-Atom"&gt;sh&lt;/span&gt;
+
+&lt;span class="s-Atom"&gt;export&lt;/span&gt; &lt;span class="nv"&gt;PS1&lt;/span&gt;&lt;span class="s-Atom"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;\[\a\]\[\e[0;31m\]\u@\h {\[\e[1;32m\]\w\[\e[0;31m\]}\n\[\e[0;31m\]$\[\033[0m\]&amp;quot;&lt;/span&gt;
+
+&lt;span class="s-Atom"&gt;export&lt;/span&gt; &lt;span class="nv"&gt;PATH&lt;/span&gt;&lt;span class="s-Atom"&gt;=~/&lt;/span&gt;&lt;span class="nn"&gt;bin&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="nv"&gt;PATH&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h2&gt;vim&lt;/h2&gt;
+&lt;h3&gt;Remapping Caps-Lock key to CTRL&lt;/h3&gt;
+&lt;p&gt;In Gnome in Fedora 18, the Caps-Lock key cannot be remapped to CTRL through the GUI keyboard settings. The remapping is done thusly:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="nv"&gt;$ &lt;/span&gt;gsettings &lt;span class="nb"&gt;set &lt;/span&gt;org.gnome.desktop.input-sources xkb-options &lt;span class="s2"&gt;&amp;quot;[&amp;#39;ctrl:nocaps&amp;#39;]&amp;quot;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;reference: http://simonbaird.blogspot.com/2013/01/fixing-caps-lock-key-in-gnome-in-fedora.html&lt;/p&gt;
+&lt;h3&gt;Shortcuts&lt;/h3&gt;
+&lt;p&gt;My vim config: https://github.com/tothebeat/.vim&lt;/p&gt;
+&lt;p&gt;Add a space after all commas that don't already have a space after them:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="p"&gt;:&lt;/span&gt;%&lt;span class="k"&gt;s&lt;/span&gt;&lt;span class="sr"&gt;/,\([^ ]\)/&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; \&lt;span class="m"&gt;1&lt;/span&gt;/&lt;span class="k"&gt;g&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Remove trailing whitespace on all lines:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="p"&gt;:&lt;/span&gt;%&lt;span class="k"&gt;s&lt;/span&gt;&lt;span class="sr"&gt;/\s\+$/&lt;/span&gt;/&lt;span class="k"&gt;g&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Move opening curly braces that appear on their own line to instead appear at the end of the statement on the previous line:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="p"&gt;:&lt;/span&gt;%&lt;span class="k"&gt;s&lt;/span&gt;&lt;span class="sr"&gt;/\n^\s*{/&lt;/span&gt; {/&lt;span class="k"&gt;g&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Remap the arrow keys to nothing to make myself use hjkl:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="nb"&gt;noremap&lt;/span&gt; &lt;span class="p"&gt;&amp;lt;&lt;/span&gt;Up&lt;span class="p"&gt;&amp;gt;&lt;/span&gt; &lt;span class="p"&gt;&amp;lt;&lt;/span&gt;Nop&lt;span class="p"&gt;&amp;gt;&lt;/span&gt;
+&lt;span class="nb"&gt;noremap&lt;/span&gt; &lt;span class="p"&gt;&amp;lt;&lt;/span&gt;Down&lt;span class="p"&gt;&amp;gt;&lt;/span&gt; &lt;span class="p"&gt;&amp;lt;&lt;/span&gt;Nop&lt;span class="p"&gt;&amp;gt;&lt;/span&gt;
+&lt;span class="nb"&gt;noremap&lt;/span&gt; &lt;span class="p"&gt;&amp;lt;&lt;/span&gt;Left&lt;span class="p"&gt;&amp;gt;&lt;/span&gt; &lt;span class="p"&gt;&amp;lt;&lt;/span&gt;Nop&lt;span class="p"&gt;&amp;gt;&lt;/span&gt;
+&lt;span class="nb"&gt;noremap&lt;/span&gt; &lt;span class="p"&gt;&amp;lt;&lt;/span&gt;Right&lt;span class="p"&gt;&amp;gt;&lt;/span&gt; &lt;span class="p"&gt;&amp;lt;&lt;/span&gt;Nop&lt;span class="p"&gt;&amp;gt;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;reference: http://codingfearlessly.com/2012/08/21/vim-putting-arrows-to-use/&lt;/p&gt;
+&lt;h2&gt;screen&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;screen -S floop&lt;/code&gt; : start a new screen session and name it "floop"&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;screen -R floop&lt;/code&gt; : reconnect to the screen session named "floop"&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;screen -ls&lt;/code&gt; : list current screen sessions&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;screen -dRR&lt;/code&gt; : goddamnit I just want to connect to a screen session&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;CTRL-a d&lt;/code&gt; : detach from the current screen session&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;CTRL-a c&lt;/code&gt; : create a new window with a shell and switch to that window&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;CTRL-a A&lt;/code&gt; : rename the current window&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;CTRL-a CTRL-a&lt;/code&gt; : toggle to the last used screen window (hold in CTRL and tap 'a' twice)&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;CTRL-a CTRL-n&lt;/code&gt; :  switch to the next window&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;CTRL-a CTRL-p&lt;/code&gt; : switch to the previous window&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2&gt;MySQL&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;To list tables in database: &lt;code&gt;SHOW TABLES;&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;To list columns in a table: &lt;code&gt;DESCRIBE table_name;&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;To show the storage engine being used by a specific table: &lt;code&gt;SELECT ENGINE FROM information_schema.TABLES WHERE TABLE_SCHEMA = 'database_name' AND TABLE_NAME = 'table_name';&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;To alter a table by adding a column: &lt;code&gt;ALTER TABLE table_name ADD column_name datatype&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;To alter a table by dropping a column: &lt;code&gt;ALTER TABLE table_name DROP COLUMN column_name&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;To alter a table by changing the type of an existing column: &lt;code&gt;ALTER TABLE table_name MODIFY column_name datatype&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;To add a user: &lt;code&gt;CREATE USER 'newuser'@'localhost' IDENTIFIED BY 'password';&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;To grant permissions to a user:&lt;code&gt;GRANT ALL PRIVILEGES ON databasename.* TO 'newuser'@'localhost'; FLUSH PRIVILEGES;&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2&gt;Django&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;To show SQL that would be generated for an app:&lt;code&gt;python manage.py sqlall app_name&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;To open a shell to the database being used by the project:&lt;code&gt;python manage.py dbshell&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;To open a shell in the context of the project:&lt;code&gt;python manage.py shell&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;To create a models.py describing the tables already existing in a database:&lt;code&gt;python manage.py inspectdb --database=database_name_in_settings_py &amp;gt; models.py&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;The database name used is not necessarily the same as that in the database itself. This is the key used in the DATABASES dictionary in settings.py.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2&gt;git&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;Show a log of previous commits, one per line, showing only the commit hash and the message:&lt;code&gt;git log --pretty=oneline&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;Throw out all local changes and revert the local repository to a previous commit specified by hash:&lt;code&gt;git reset --hard sha1_hash_here&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;Make a commit of all local changes with a message on the command line (as opposed to the default of spawning an editor):&lt;code&gt;git commit -a -m "Added stuff."&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;Update local repository with all changes since last update from remote:&lt;code&gt;git pull&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;Update remote repository with local changes:&lt;code&gt;git push&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;Show all branches with current branch indicated by an asterisk:&lt;code&gt;git branch&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;Switch to another branch:&lt;code&gt;git checkout branch_name&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;Merge all changes from another branch into the current branch:&lt;code&gt;git merge other_branch_name&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;Create a new branch and check out code to it immediately:&lt;code&gt;git checkout -b new_branch_name&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;List files changed in a single commit: &lt;code&gt;git show --name-only commit-hash&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;List files changed between two commits:&lt;code&gt;git diff commit-hash-1 commit-hash-2 --name-only&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;Stash your changes before you're ready for a commit but need to pull or otherwise merge changes:&lt;code&gt;git stash&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;Apply your changes again from the stash:&lt;code&gt;git stash apply&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3&gt;git-rebase&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;Run git log &lt;code&gt;git log --pretty=oneline&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;Copy hash of commit just before the ones you want to merge. Use it in: &lt;code&gt;git rebase -i hash&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;Change the more recent commit from 'pick' to 'f', save file&lt;/li&gt;
+&lt;li&gt;(optional) If you need to amend your change on Gerrit, &lt;code&gt;git push -f origin HEAD:refs/for/master&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3&gt;Helpful References&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;http://cheat.errtheblog.com/s/git&lt;/li&gt;
+&lt;li&gt;http://rogerdudler.github.io/git-guide/&lt;/li&gt;
+&lt;li&gt;http://pcottle.github.io/learnGitBranching/&lt;/li&gt;
+&lt;li&gt;https://wiki.openstack.org/wiki/GitCommitMessages&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3&gt;password-less ssh login&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;Generate an SSH key pair on your client machine if you have not already done so. &lt;code&gt;ssh-keygen -t rsa&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;Register this key with the SSH agent.  &lt;code&gt;ssh-add&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;Copy the id_rsa.pub to the remote host. &lt;code&gt;ssh-copy-id &amp;lt;host&amp;gt;&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3&gt;Mounting locally using SSHFS&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;Install SSHFS.  &lt;code&gt;sudo yum install fuse-sshfs&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;Create a mount point.   &lt;code&gt;mkdir -p ~/Documents/Code/xylem-redux/&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;Mount.  &lt;code&gt;sshfs nbennett@xylem-redux: ~/Documents/Code/xylem-redux/&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3&gt;Tunnelling MySQL through SSH&lt;/h3&gt;
+&lt;p&gt;Forward the MySQL 3306 port on xylem-redux to port 3307 on localhost to use MySQL Workbench more easily. 
+&lt;code&gt;ssh -L 3307:localhost:3306 nbennett@xylem-redux&lt;/code&gt;&lt;/p&gt;
+&lt;h3&gt;Activating Virtual Environment&lt;/h3&gt;
+&lt;p&gt;This sets the PATH so that you can use python and pip without having to provide the full path. 
+&lt;code&gt;source pythonenv/bin/activate&lt;/code&gt;&lt;/p&gt;
+&lt;h2&gt;PHP&lt;/h2&gt;
+&lt;h3&gt;Debugging&lt;/h3&gt;
+&lt;p&gt;To aid debugging in the PHP, throw this at the top of your settings.php file:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="x"&gt;//ini_set(&amp;#39;display_errors&amp;#39;, &amp;#39;On&amp;#39;);&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Then just uncomment it when you want to see errors.&lt;/p&gt;
+&lt;h3&gt;Setting Up on dev server&lt;/h3&gt;
+&lt;h4&gt;Setting Up Apache VirtualHost&lt;/h4&gt;
+&lt;p&gt;Apache VirtualHost config files are located in /etc/httpd/vhosts.d/. You should already have a VirtualHost configured for 443/SSL. Add the highlighted lines to your &lt;VirtualHost *:443&gt; section:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="nt"&gt;&amp;lt;VirtualHost&lt;/span&gt; &lt;span class="err"&gt;*:443&lt;/span&gt;&lt;span class="nt"&gt;&amp;gt;&lt;/span&gt;
+    ServerName nbennett.xylem-redux.wiredtree.com:443
+    DocumentRoot &amp;quot;/home/nbennett/www/&amp;quot;
+    ServerAdmin nbennett@wiredtree.com
+    ErrorLog logs/nbennett-ssl_error_log
+    LogLevel warn
+    SSLEngine on
+    SSLCipherSuite ALL:!ADH:!EXPORT56:RC4+RSA:+HIGH:+MEDIUM:+LOW:+SSLv2:+EXP
+    SSLCertificateFile /etc/httpd/conf/ssl/server.crt
+    SSLCertificateKeyFile /etc/httpd/conf/ssl/server.key
+    Alias /inventory /home/nbennett/src/wt/inventory/htdocs
+    WSGIScriptAlias /arbor /home/nbennett/src/wt/arbor/arbor/wsgi.py
+    WSGIScriptAlias /creeper /home/nbennett/src/wt/creeper/creeper/wsgi.py
+    WSGIPassAuthorization On
+#     &lt;span class="nt"&gt;&amp;lt;Location&lt;/span&gt; &lt;span class="nt"&gt;/&amp;gt;&lt;/span&gt;
+#         Order Deny,Allow
+#         AuthType Basic
+#         AuthName &amp;quot;nbennett.xylem-redux.wiredtree.com&amp;quot;
+#         AuthUserFile /var/www/auth/xylemusers
+#         Require valid-user
+#         SSLRequireSSL
+#     &lt;span class="nt"&gt;&amp;lt;/Location&amp;gt;&lt;/span&gt;
+&lt;span class="nt"&gt;&amp;lt;/VirtualHost&amp;gt;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h4&gt;Clone the repository from Gerrit&lt;/h4&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="nb"&gt;cd&lt;/span&gt; ~/src/wt/
+git clone ssh://nbennett@gerrit.wiredtree.com:29418/api/creeper.git
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h4&gt;Create a virtualenv&lt;/h4&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="nb"&gt;cd&lt;/span&gt; ~/src/wt/creeper/
+virtualenv pythonenv
+&lt;span class="nb"&gt;source &lt;/span&gt;pythonenv/bin/activate
+pip install -r requirements.txt
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h2&gt;SAE pack for Pidgin&lt;/h2&gt;
+&lt;p&gt;Since sae.tweek.us is no more, you can't get your SAE pack on... unless you get the download here!&lt;/p&gt;
+&lt;p&gt;https://github.com/tothebeat/saemoticons/raw/master/SA-Emoticons-Pidgin.tar.gz&lt;/p&gt;
+&lt;p&gt;Need a reference on the smilies? &lt;/p&gt;
+&lt;p&gt;[http://forums.somethingawful.com/misc.php?action=showsmilies Go to the source]&lt;/p&gt;
+&lt;p&gt;[https://github.com/tothebeat/saemoticons Work with the image URLs and emoticon shortcuts scraped from the source]&lt;/p&gt;</summary><category term="python"></category></entry><entry><title>This Is Not A Blog</title><link href="http://ohrho.com/this-is-not-a-blog.html" rel="alternate"></link><updated>2013-11-16T19:09:00-06:00</updated><author><name>Nick Bennett</name></author><id>tag:ohrho.com,2013-11-16:this-is-not-a-blog.html</id><summary type="html">&lt;p&gt;Blogging is hard. Writing well for an audience, making it worth their time to read, is no small task. While I appreciate good writing, this is not my platform for demonstrating my own skills to you. This is not my soap box. I have no interest in convincing you of anything. I don't even really care about expressing my views, because I feel that means I want someone to listen (I don't). Except for my relationships with a very select few people, I know that my opinion has little to no effect on anyone, so I just don't bother wasting the breath.&lt;/p&gt;
+&lt;p&gt;When I write content for this place, such as this article right here, I remind myself that I need not choose something to write about that I think will be interesting to other people. Oh, you do think this is interesting? Well, bloody jolly good! But I don't really care. You think this is boring? Then why are you even reading this? Yes, I will insult my potential reader because I only expect myself to ever read this. Yes, I insult myself constantly.&lt;/p&gt;
+&lt;p&gt;The linear structure of blogs is overly simplistic to me. Perhaps that comes with the meaning of "log". I want this to serve as a growing collection of my thoughts over time, growing both in content as well as structural complexity. I have not seen tags used to organize content in any way that I find satisfying. For the past several years, I have been driven to get better at programming in large part because I want to make that a reality.&lt;/p&gt;
+&lt;p&gt;This is not a soap box. This is just the next step with creative, free-form tools from pen and paper.&lt;/p&gt;</summary><category term="reflection"></category></entry><entry><title>Other People's Books</title><link href="http://ohrho.com/chipy-nov-2013.html" rel="alternate"></link><updated>2013-11-15T19:34:00-06:00</updated><author><name>Nick Bennett</name></author><id>tag:ohrho.com,2013-11-15:chipy-nov-2013.html</id><summary type="html">&lt;p&gt;Yesterday I went to the ChiPy November meeting, which was held at the &lt;a href="http://www.spartzinc.com/"&gt;Spartz&lt;/a&gt; offices. Their office is pretty neat, there was free pizza and beer, there were interesting people to talk to, but what I liked best was perusing their books.&lt;/p&gt;
+&lt;p&gt;All my life, I've gravitated to the bookshelves in a room to run my eyes across the book spines in hopes of finding something interesting. While I worked at &lt;a href="http://www.kellogg.northwestern.edu/"&gt;Kellogg&lt;/a&gt;, I loved working on the PCs of certain professors because I knew they had interesting books on their bookshelves. In the 11 years I worked there, I spent thousands of hours working in other people's offices, fixing their computers, and in every lull or progress bar I would take a glance at those fascinating spines.&lt;/p&gt;
+&lt;p&gt;I took a picture of SpartzInc's bookcase, so I would be able to look at the spines more later. Do other people do this?&lt;/p&gt;
+&lt;p&gt;&lt;img alt="SpartzInc's bookcase" src="./images/2013-11-14_21.38.13.jpg" /&gt;&lt;/p&gt;</summary><category term="python chipy books"></category></entry><entry><title>Favorite Python Modules</title><link href="http://ohrho.com/favorite-python-modules.html" rel="alternate"></link><updated>2013-11-13T23:12:00-06:00</updated><author><name>Nick Bennett</name></author><id>tag:ohrho.com,2013-11-13:favorite-python-modules.html</id><summary type="html">&lt;ul&gt;
+&lt;li&gt;&lt;a href="http://www.python-requests.org/en/latest/"&gt;requests&lt;/a&gt; - Working with HTTP requests in a way that doesn't make me want to shove a stick in my eye.&lt;/li&gt;
+&lt;li&gt;&lt;a href="http://pillow.readthedocs.org/en/latest/"&gt;pillow&lt;/a&gt; - I liked PIL, the Python Imaging Library, but I guess that wasn't good enough for some folks and so they made it better. I like the name too. &lt;/li&gt;
+&lt;li&gt;&lt;a href="https://pypi.python.org/pypi/unicodecsv/0.9.0"&gt;unicodecsv&lt;/a&gt; - Try working with international character sets in any kind of tabular data, that you need to work with in Python. You'll need this. And a machete.&lt;/li&gt;
+&lt;li&gt;&lt;a href="http://www.crummy.com/software/BeautifulSoup/"&gt;beautifulsoup&lt;/a&gt; - An awesome html parsing module, that can use either &lt;a href="http://lxml.de/"&gt;lxml&lt;/a&gt; or &lt;a href="https://github.com/html5lib/html5lib-python"&gt;html5lib&lt;/a&gt; for its engine. &lt;/li&gt;
+&lt;li&gt;&lt;a href="http://docs.python.org/2/library/__future__.html"&gt;&lt;strong&gt;future&lt;/strong&gt;&lt;/a&gt; - Just for &lt;code&gt;unicode_literals&lt;/code&gt;. It has a lot of imports that help prepare for Python 3, but this single import makes working with unicode strings so much less painful. No need to remember to tack on a 'u' before every string.  &lt;/li&gt;
+&lt;li&gt;&lt;a href="https://www.djangoproject.com/"&gt;django&lt;/a&gt; - Hey, I have to like this because it's my job. It's pretty nice, don't get me wrong.&lt;/li&gt;
+&lt;li&gt;&lt;a href="http://docs.python.org/2/library/re.html"&gt;re&lt;/a&gt; - You can't avoid using this. Like it.&lt;/li&gt;
+&lt;li&gt;&lt;a href="http://docs.python.org/2/library/collections.html#collections.defaultdict"&gt;collections&lt;/a&gt; - Just for &lt;code&gt;defaultdict&lt;/code&gt;. &lt;code&gt;d = defaultdict(lambda: [])&lt;/code&gt; is just beautiful. &lt;/li&gt;
+&lt;li&gt;&lt;a href="http://ipython.org/"&gt;ipython&lt;/a&gt; - Nothing beats this shell.&lt;/li&gt;
+&lt;li&gt;&lt;a href="http://www.seleniumhq.org/"&gt;selenium&lt;/a&gt; - This makes &lt;a href="http://www.realpython.com/blog/python/headless-selenium-testing-with-python-and-phantomjs/#.UoRfeh8TDZg"&gt;scraping&lt;/a&gt; easy.&lt;/li&gt;
+&lt;li&gt;&lt;a href="http://www.sqlalchemy.org/"&gt;sqlalchemy&lt;/a&gt; - I've barely scratched the surface with this, or even used it properly, but it has helped me vastly reduce the complexity of using a SQL database in the past.&lt;/li&gt;
+&lt;li&gt;&lt;a href="http://www.python-excel.org/"&gt;xlrd/xlwt&lt;/a&gt; - Two modules for reading and writing Excel files, respectively. These can handle '.xls' files from Office 2003 and earlier, along with '.xlsx' files from Office 2007 and newer.&lt;/li&gt;
+&lt;li&gt;&lt;a href="http://docs.getpelican.com/en/3.3.0/"&gt;pelican&lt;/a&gt; - I have to represent for what created this blog. &lt;/li&gt;
+&lt;/ul&gt;</summary><category term="python"></category></entry><entry><title>New Challenges</title><link href="http://ohrho.com/new-challenges.html" rel="alternate"></link><updated>2013-11-13T22:20:00-06:00</updated><author><name>Nick Bennett</name></author><id>tag:ohrho.com,2013-11-13:new-challenges.html</id><summary type="html">&lt;p&gt;This is truly a challenge. I must be a masochist. I've set up this blog tonight 
+on my domain &lt;a href="http://ohroh.com"&gt;http://ohroh.com&lt;/a&gt; using my &lt;a href="http://www.webfaction.com"&gt;webfaction&lt;/a&gt; 
+account, using the static blog generator &lt;a href="http://docs.getpelican.com/en/3.3.0/"&gt;Pelican&lt;/a&gt; 
+in a &lt;a href="http://docs.python.org/2/"&gt;Python&lt;/a&gt; &lt;a href="http://docs.python-guide.org/en/latest/dev/virtualenvs/"&gt;virtual environment&lt;/a&gt;. 
+I'm editing this page in the text editor vim, connected to my webfaction account over SSH. 
+No GUI here, which is startling for me since I really like clicking things with a mouse. 
+I do this kind of stuff all day at work, and I've been programming for many years, and 
+still this feels completely foreign to me. &lt;/p&gt;
+&lt;p&gt;I guess that gets to the heart of the matter; it should feel foreign, because I really
+haven't done anything this challenging before. I really find working in the command-line
+interface of Linux to be challenging, especially using the keybindings of vim without
+the arrow keys, but I have shown myself it is possible for me to learn new things. I 
+now use the letters 'hjkl' for left/down/up/right. A year ago, asking me to do that while
+doing something else I've never done before would be like asking me to ride a bicycle
+on the ceiling.&lt;/p&gt;
+&lt;p&gt;I feel very uncomfortable doing these things I'm not familiar with, doing things I feel
+I'm not good at (yet), especially when doing them in public or for pay. And yet I persist,
+doing these things both for pay and ostensibly in public (this, &lt;a href="https://github.com/tothebeat"&gt;github&lt;/a&gt;)
+because I know that life is too short to stick with what's easiest and most comfortable.&lt;/p&gt;</summary><category term="python reflection"></category></entry></feed>

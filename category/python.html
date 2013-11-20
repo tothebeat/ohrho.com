@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+        <meta charset="utf-8" />
+        <title>ohrho - Python</title>
+        <link rel="stylesheet" href="http://ohrho.com/theme/css/main.css" />
+        <link href="http://ohrho.com/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="ohrho Atom Feed" />
+
+        <!--[if IE]>
+            <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+</head>
+
+<body id="index" class="home">
+<a href="https://github.com/tothebeat">
+<img style="position: absolute; top: 0; right: 0; border: 0;" src="http://s3.amazonaws.com/github/ribbons/forkme_right_red_aa0000.png" alt="Fork me on GitHub" />
+</a>
+        <header id="banner" class="body">
+                <h1><a href="http://ohrho.com/">ohrho </a></h1>
+                <nav><ul>
+                    <li><a href="http://ohrho.com/category/code.html">Code</a></li>
+                    <li class="active"><a href="http://ohrho.com/category/python.html">Python</a></li>
+                    <li><a href="http://ohrho.com/category/reflection.html">Reflection</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+
+            <aside id="featured" class="body">
+                <article>
+                    <h1 class="entry-title"><a href="http://ohrho.com/installing-gerrit-code-review.html">Install Gerrit Code Review</a></h1>
+<footer class="post-info">
+        <abbr class="published" title="2013-11-19T22:21:00">
+                Tue 19 November 2013
+        </abbr>
+
+        <address class="vcard author">
+                By <a class="url fn" href="http://ohrho.com/author/nick-bennett.html">Nick Bennett</a>
+        </address>
+<p>In <a href="http://ohrho.com/category/python.html">Python</a>. </p>
+<p>tags: <a href="http://ohrho.com/tag/python.html">python</a></p>
+</footer><!-- /.post-info --><p>For the uninitiated, <a href="https://code.google.com/p/gerrit/">Gerrit Code Review</a> is a <a href="http://en.wikipedia.org/wiki/Software_code_review">code review system</a> used by some major projects like <a href="http://review.cyanogenmod.org">cyanogenmod</a>, <a href="https://android-review.googlesource.com">android</a>, and <a href="https://review.openstack.org">openstack</a>. It can be integrated nicely with <a href="http://git-scm.com/book/ch4-6.html">gitweb</a>, a simple but reliable web interface for browsing your git repositories. </p>
+<p>Gerrit Code Review has documentation, but I found that it was difficult to understand if I wanted to do anything that wasn't default. Below are the notes I took while installing and configuring it at work. I hope that this can be of some use to others.</p>
+<h3>Installing Gerrit</h3>
+<p><a href="http://gerrit-documentation.googlecode.com/svn/Documentation/2.6/install-quick.html">Installation Docs</a></p>
+<h4>Check Java</h4>
+<div class="highlight"><pre>CT-111-bash-4.1# java -version
+java version <span class="s2">&quot;1.7.0_21&quot;</span>
+Java<span class="o">(</span>TM<span class="o">)</span> SE Runtime Environment <span class="o">(</span>build 1.7.0_21-b11<span class="o">)</span>
+Java HotSpot<span class="o">(</span>TM<span class="o">)</span> 64-Bit Server VM <span class="o">(</span>build 23.21-b01, mixed mode<span class="o">)</span>
+</pre></div>
+
+
+<h4>Create user and login</h4>
+<div class="highlight"><pre>adduser gerrit2
+sudo su gerrit2
+<span class="nb">cd</span> ~
+</pre></div>
+
+
+<h4>Get Gerrit</h4>
+<div class="highlight"><pre>wget http://gerrit-releases.storage.googleapis.com/gerrit-2.6.war
+</pre></div>
+
+
+<h4>Initialize &amp; Start Gerrit Site</h4>
+<div class="highlight"><pre>java -jar gerrit-2.6.war init --batch -d ~/gerrit_sneakysnakes
+</pre></div>
+
+
+<h4>Add Gerrit Daemon to Startup</h4>
+<p>Make a symlink of the script in rc3.d:</p>
+<div class="highlight"><pre>CT-111-bash-4.1# sudo ln -snf /home/gerrit2/gerrit_sneakysnakes/bin/gerrit.sh /etc/init.d/gerrit
+CT-111-bash-4.1# sudo ln -snf /etc/init.d/gerrit /etc/rc3.d/S90gerrit
+</pre></div>
+
+
+<p>Set the GERRIT_SITE environment variable in <code>/etc/default/gerritcodereview</code>:</p>
+<div class="highlight"><pre><span class="n">GERRIT_SITE</span><span class="o">=/</span><span class="n">home</span><span class="o">/</span><span class="n">gerrit2</span><span class="o">/</span><span class="n">gerrit_sneakysnakes</span>
+</pre></div>
+
+
+<h4>Configure Gerrit to run through reverse proxy</h4>
+<p>Edit <code>/home/gerrit2/gerrit_sneakysnakes/etc/gerrit.config</code>, change:</p>
+<div class="highlight"><pre><span class="n">canonicalWebUrl</span> <span class="o">=</span> <span class="n">http</span><span class="o">:</span><span class="c1">//gerrit.sneakysnakes.com:8080/</span>
+</pre></div>
+
+
+<p>to:</p>
+<div class="highlight"><pre><span class="n">canonicalWebUrl</span> <span class="o">=</span> <span class="n">http</span><span class="o">:</span><span class="c1">//gerrit.sneakysnakes.com/</span>
+</pre></div>
+
+
+<p>and change:</p>
+<div class="highlight"><pre><span class="n">listenUrl</span> <span class="o">=</span> <span class="n">http</span><span class="o">:</span><span class="c1">//*:8080/</span>
+</pre></div>
+
+
+<p>to:</p>
+<div class="highlight"><pre><span class="n">listenUrl</span> <span class="o">=</span> <span class="n">proxy</span><span class="o">-</span><span class="n">http</span><span class="o">:</span><span class="c1">//127.0.0.1:8080/</span>
+</pre></div>
+
+
+<p>Edit <code>/etc/httpd/conf.d/gerrit.conf</code> and confirm it contains the following:</p>
+<div class="highlight"><pre><span class="nt">&lt;VirtualHost</span> <span class="err">173.199.152.62:80</span><span class="nt">&gt;</span>
+  ServerName 173.199.152.62
+
+  ProxyRequests Off
+  ProxyVia Off
+  ProxyPreserveHost On
+
+  <span class="nt">&lt;Proxy</span> <span class="err">*</span><span class="nt">&gt;</span>
+    Order deny,allow
+    Allow from all
+  <span class="nt">&lt;/Proxy&gt;</span>
+
+  <span class="nt">&lt;Location</span> <span class="nt">/&gt;</span>
+    AuthType Basic
+    AuthName &quot;Gerrit Code Review&quot;
+    Require valid-user
+    AuthUserFile /etc/httpd/htpasswds/gerrit
+  <span class="nt">&lt;/Location&gt;</span>
+
+  AllowEncodedSlashes On
+  ProxyPass / http://127.0.0.1:8080/ nocanon
+<span class="nt">&lt;/VirtualHost&gt;</span>
+</pre></div>
+
+
+<p>(according to <a href="https://gerrit-review.googlesource.com/Documentation/config-reverseproxy.html">setup instructions</a>, the two options <code>AllowEncodedSlashes On</code> and <code>ProxyPass .. nocanon</code> are required since Gerrit 2.6.)</p>
+<h4>Add HTTP auth</h4>
+<p>Generate HTTP auth accounts for everyone:</p>
+<div class="highlight"><pre>CT-111-bash-4.1# htpasswd /etc/httpd/htpasswds/gerrit admin
+CT-111-bash-4.1# htpasswd /etc/httpd/htpasswds/gerrit nbennett
+</pre></div>
+
+
+<p>Enable HTTP auth pass-through for Gerrit:</p>
+<div class="highlight"><pre>CT-111-bash-4.1# git config --file /home/gerrit2/gerrit_sneakysnakes/etc/gerrit.config auth.type HTTP
+CT-111-bash-4.1# git config --file /home/gerrit2/gerrit_sneakysnakes/etc/gerrit.config --unset auth.httpHeader
+CT-111-bash-4.1# git config --file /home/gerrit2/gerrit_sneakysnakes/etc/gerrit.config auth.emailFormat <span class="s1">&#39;{0}@sneakysnakes.com&#39;</span>
+</pre></div>
+
+
+<h4>Apply Changes</h4>
+<p>Restart Gerrit:</p>
+<div class="highlight"><pre>CT-111-bash-4.1# /home/gerrit2/gerrit_sneakysnakes/bin/gerrit.sh restart
+</pre></div>
+
+
+<p>Restart Apache:</p>
+<div class="highlight"><pre>CT-111-bash-4.1# /etc/init.d/httpd restart
+</pre></div>
+
+
+<h4>Installing and Configuring Firewall</h4>
+<p>Modify <code>/etc/csf/csf.conf</code> to add port 29418 (Gerrit) to the TCP_IN list:</p>
+<div class="highlight"><pre><span class="cp"># Allow incoming TCP ports</span>
+<span class="n">TCP_IN</span> <span class="o">=</span> <span class="s">&quot;20,21,22,25,26,53,80,110,143,443,465,587,993,995,2077,2078,2082,2083,2086,2087,2095,2096,9100,9200,29418,30000:35000&quot;</span>
+</pre></div>
+
+
+<p>Restart CSF:</p>
+<div class="highlight"><pre>CT-111-bash-4.1# service csf restart
+</pre></div>
+
+
+<h4>Create Admin</h4>
+<p>The first user to log in to a new installation will automatically be set as the admin. Log in to http://gerrit.sneakysnakes.com/ for the first time with the admin account created earlier. Subsequent logins will create ordinary Registered User accounts. </p>
+<p>To switch users once logged in as admin, prepend <code>logout@</code> to the url, i.e. go to http://logout@gerrit.sneakysnakes.com/.</p>
+<h4>Set Permissions</h4>
+<p>Access Control is configured through the All-Projects settings. Log in to http://gerrit.sneakysnakes.com/ as admin. Go to Projects-&gt;List in the upper left corner, and click on All-Projects. Click the <code>Edit</code> button to make changes. (refs: <a href="http://gerrit.sneakysnakes.com/Documentation/access-control.html">Access Control</a> <a href="http://gerrit.sneakysnakes.com/Documentation/config-labels.html">Config Labels</a>)</p>
+<h5>Push Existing Repos without Code Review</h5>
+<p>In order to push an existing project into Gerrit without requiring every existing commit to be reviewed, a few flags need to  be set on the project. The easiest way to do this is to change the All-Projects template, set these flags for the Administrators group, and then simply add yourself to the Administrators group if you're going to be pushing an existing project. </p>
+<p>Under the section marked by <code>Reference: refs/heads/*</code>, you will find the previously mentioned flags. The Administrators group should already have these flags enabled.</p>
+<p>To bypass review, push to refs/heads/master instead of refs/for/master (see <a href="http://gerrit.sneakysnakes.com/Documentation/user-upload.html#bypass_review">this</a>).</p>
+<h4>Set default Code-Review range to (-2,+2</h4>
+<p>Under the section marked by <code>Reference: refs/heads/*</code>, look for <code>Label Code-Review</code>. By default, just the groups <code>Administrators</code> and <code>Project Owners</code> can use -2 and +2 ratings, and the <code>Registered Users</code> group is limited to -1, 0, and +1. Change the min and max ratings usable by <code>Registered Users</code> to -2 and +2.</p>
+<h5>Allow gitweb Read Access</h5>
+<p>In the All-Projects settings, under the "'''Reference:''' refs/meta/config" section, with respect to the ''Read'' permission, add the '''Registered Users''' group.</p>
+<h3>Using Gerrit</h3>
+<h4>Set your account password</h4>
+<p>Log in to the Gerrit server via the node, spacecadet. You can find the container ID for gerrit.sneakysnakes.com:</p>
+<div class="highlight"><pre><span class="n">root</span><span class="err">@</span><span class="n">spacecadet</span> <span class="p">[</span><span class="mi">1681</span> <span class="mi">11</span><span class="o">:</span><span class="mi">23</span><span class="o">:</span><span class="mi">52</span> <span class="o">~</span><span class="p">]</span><span class="err">$</span> <span class="n">vzlist</span>
+      <span class="n">CTID</span>      <span class="n">NPROC</span> <span class="n">STATUS</span>       <span class="n">IP_ADDR</span>         <span class="n">HOSTNAME</span>
+
+       <span class="mi">111</span>         <span class="mi">11</span> <span class="n">running</span>      <span class="mf">123.123.123.123</span>  <span class="n">gerrit</span><span class="p">.</span><span class="n">sneakysnakes</span><span class="p">.</span><span class="n">com</span>
+</pre></div>
+
+
+<p>Enter the server with:</p>
+<div class="highlight"><pre>root@spacecadet <span class="o">[</span>1682 11:24:08 ~<span class="o">]</span><span class="nv">$ </span>vzctl enter 111
+</pre></div>
+
+
+<p>Your HTTP auth username should be the name stub of your sneakysnakes email address. My email address is nbennett@sneakysnakes.com, so my username will be <code>nbennett</code>. Set your htpasswd this way:</p>
+<div class="highlight"><pre>CT-111-bash-4.1# htpasswd /etc/httpd/htpasswds/gerrit nbennett
+</pre></div>
+
+
+<h4>Add RSA public key to your Gerrit account</h4>
+<p>Add the contents of your ~/.ssh/id_rsa.pub file to the SSH public keys options in your user account settings on the Gerrit site. Click on your name in the upper-right corner of the page, click on Settings, and then click on SSH Public Keys. </p>
+<h4>Add Gerrit commit hook script to automatically add Change-Id to commit messages</h4>
+<p>In the root of the repo from which you will be making commits, retrieve the Gerrit script that will automatically add a Change-Id to all future commits (change nbennett to your username) (<a href="http://stackoverflow.com/questions/8845658/gerrit-error-when-change-id-in-commit-messages-are-missing">ref</a>):</p>
+<div class="highlight"><pre>scp -p -P 29418 nbennett@gerrit.sneakysnakes.com:hooks/commit-msg .git/hooks/
+</pre></div>
+
+
+<h4>Adding git remote for Gerrit</h4>
+<p>Instead of laboriously typing in the full path every time to Gerrit and having to remember the arcane port number, you can add a git remote alias for gerrit:</p>
+<div class="highlight"><pre>git remote add gerrit ssh://nbennett@gerrit.sneakysnakes.com:29418/arbor/arbor
+</pre></div>
+
+
+<p>This adds the following text to the .git/config file in your repository:</p>
+<div class="highlight"><pre><span class="k">[remote &quot;gerrit&quot;]</span>
+        <span class="na">url</span> <span class="o">=</span> <span class="s">ssh://nbennett@gerrit.sneakysnakes.com:29418/arbor/arbor</span>
+<span class="s">        fetch = +refs/heads/*:refs/remotes/gerrit/*</span>
+</pre></div>
+
+
+<p>You can then push changes simply with:</p>
+<div class="highlight"><pre>git push gerrit HEAD:refs/for/master
+</pre></div>
+
+
+<h4>Add existing git repo to Gerrit</h4>
+<ol>
+<li>Add yourself to the Administrators group. <ol>
+<li>Log in to http://gerrit.sneakysnakes.com/ as admin (you may need to log out first with http://logout@gerrit.sneakysnakes.com/). </li>
+<li>Click on People in the upper left, then click on List Groups. Click on the Administrators group.</li>
+<li>Type your username in the Members text field and click Add. NOTE: You must have logged in at least once before to have the account created and available for adding.</li>
+<li>Log out of gerrit and log back in as yourself.</li>
+</ol>
+</li>
+<li>Create a new project on Gerrit<ol>
+<li>From the command line:<code>ssh -p 29418 nbennett@gerrit.sneakysnakes.com gerrit create-project --name arbor/arbor</code></li>
+<li>Go to http://gerrit.sneakysnakes.com/ and click on Projects in the upper left corner, and then on List. Click on the new project you just created. Then click on Access, to the right of the Projects-&gt;List option. </li>
+<li>Click the Edit button, and then click the Add Reference link. Leave the default Reference as "refs/heads/*". From the drop-down menu, pick "Create Reference". For the group name, type "Administrators" and then click the Add button to the right. Repeat this, choosing "Forge Committer Identity" and "Forge Author Identity" from the drop-down menu and adding Administrators for each one. When finished, click the "Save Changes" button at the bottom. (<a href="http://stackoverflow.com/questions/8353988/how-to-upload-a-git-repo-to-gerrit">ref</a>)</li>
+</ol>
+</li>
+<li>Push your repo<ol>
+<li>In the command line, in the root of your repo, run (<a href="http://en.wikibooks.org/wiki/Git/Gerrit_Code_Review#Importing_project_into_Gerrit">ref</a>): <code>git push ssh://nbennett@gerrit.sneakysnakes.com:29418/arbor/arbor HEAD:refs/heads/master</code></li>
+</ol>
+</li>
+<li>Remove yourself from the Administrators group<ol>
+<li>Log out of Gerrit with http://logout@gerrit.sneakysnakes.com/, log in as admin.</li>
+<li>Following the steps you used previously to add yourself to the Administrators group, get to the point where you would have typed in your username to the Members text field. Your name is listed below. Check the box next to your name and click the Delete button. </li>
+</ol>
+</li>
+<li>Log out of Gerrit and log back in as yourself.</li>
+</ol>
+<h4>Pushing changes to be reviewed</h4>
+<p>With your commits created with the Gerrit Change-Id hook script already installed, you're ready to push to Gerrit to have your changes reviewed:</p>
+<div class="highlight"><pre><span class="n">git</span> <span class="n">push</span> <span class="n">ssh</span><span class="o">:</span><span class="c1">//nbennett@gerrit.sneakysnakes.com:29418/arbor/arbor HEAD:refs/for/master</span>
+</pre></div>
+
+
+<h4>To give a project the Verified label</h4>
+<p>See: http://gerrit-documentation.googlecode.com/svn/Documentation/2.6/config-labels.html#label_Verified</p>
+<ul>
+<li>Clone the project repository</li>
+<li><code>git fetch origin refs/meta/config</code></li>
+<li><code>git checkout FETCH_HEAD</code></li>
+<li><code>vi project.config</code><br />
+ Add:</li>
+</ul>
+<div class="highlight"><pre> <span class="cp">[</span><span class="nb">label</span> <span class="s2">&quot;Verified&quot;</span><span class="cp">]</span>
+     <span class="kd">function</span> <span class="o">=</span> <span class="nx">MaxWithBlock</span>
+     <span class="nx">value</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span> <span class="nx">Fails</span>
+     <span class="nx">value</span> <span class="o">=</span>  <span class="mi">0</span> <span class="nx">No</span> <span class="nx">score</span>
+     <span class="nx">value</span> <span class="o">=</span> <span class="o">+</span><span class="mi">1</span> <span class="nx">Verified</span>
+</pre></div>
+
+
+<ul>
+<li><code>git add --all</code></li>
+<li><code>git commit -m "Add Verified label."</code></li>
+<li><code>git push origin HEAD:refs/meta/config</code></li>
+<li>Make sure the project gives Non-Interactive Users (aka, buildbot) the ability to use the Verify label.</li>
+<li>Make sure the user that will use Verify has the permissions.</li>
+<li>(May have to restart the gerrit server?)</li>
+</ul>
+<p>Note: The buildbot source code has been slightly modified in pythonenv/lib/python2.6/site-packages/buildbot/status/status_gerrit.py to support this new --label syntax as the current stable version (0.8.7p1) doesn't support it:</p>
+<div class="highlight"><pre> <span class="o">-</span><span class="n">command</span><span class="p">.</span><span class="n">extend</span><span class="p">([</span><span class="s">&quot;--verified %d&quot;</span> <span class="o">%</span> <span class="kt">int</span><span class="p">(</span><span class="n">verified</span><span class="p">)])</span>
+ <span class="o">+</span><span class="n">command</span><span class="p">.</span><span class="n">extend</span><span class="p">([</span><span class="s">&quot;--label Verified=%d&quot;</span> <span class="o">%</span> <span class="kt">int</span><span class="p">(</span><span class="n">verified</span><span class="p">)])</span>
+</pre></div>
+
+
+<h4>Further Help</h4>
+<ul>
+<li><a href="http://gerrit.sneakysnakes.com/Documentation/intro-quick.html">Quick Introduction</a></li>
+<li><a href="https://wiki.openstack.org/wiki/Gerrit_Workflow">Gerrit Workflow for OpenStack</a></li>
+</ul>                </article>
+            </aside><!-- /#featured -->
+                <section id="content" class="body">
+                    <h1>Other articles</h1>
+                    <hr />
+                    <ol id="posts-list" class="hfeed">
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="http://ohrho.com/notes-from-beginning-developer.html" rel="bookmark"
+                           title="Permalink to notes from work">notes from work</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2013-11-19T21:56:00">
+                Tue 19 November 2013
+        </abbr>
+
+        <address class="vcard author">
+                By <a class="url fn" href="http://ohrho.com/author/nick-bennett.html">Nick Bennett</a>
+        </address>
+<p>In <a href="http://ohrho.com/category/python.html">Python</a>. </p>
+<p>tags: <a href="http://ohrho.com/tag/python.html">python</a></p>
+</footer><!-- /.post-info -->                <p>personal notes I used while getting started at my programming job.</p>
+                <a class="readmore" href="http://ohrho.com/notes-from-beginning-developer.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="http://ohrho.com/favorite-python-modules.html" rel="bookmark"
+                           title="Permalink to Favorite Python Modules">Favorite Python Modules</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2013-11-13T23:12:00">
+                Wed 13 November 2013
+        </abbr>
+
+        <address class="vcard author">
+                By <a class="url fn" href="http://ohrho.com/author/nick-bennett.html">Nick Bennett</a>
+        </address>
+<p>In <a href="http://ohrho.com/category/python.html">Python</a>. </p>
+<p>tags: <a href="http://ohrho.com/tag/python.html">python</a></p>
+</footer><!-- /.post-info -->                <p>A growing list of my favorite modules/libraries for Python.</p>
+                <a class="readmore" href="http://ohrho.com/favorite-python-modules.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+            </ol><!-- /#posts-list -->
+<p class="paginator">
+    Page 1 / 1
+</p>
+            </section><!-- /#content -->
+        <section id="extras" class="body">
+                <div class="blogroll">
+                        <h2>blogroll</h2>
+                        <ul>
+                            <li><a href="http://news.ycombinator.com/">Hacker News</a></li>
+                            <li><a href="http://lobste.rs/">lobste.rs</a></li>
+                            <li><a href="http://joelonsoftware.com">Joel Spolsky</a></li>
+                            <li><a href="http://sivers.org/">Derek Sivers</a></li>
+                            <li><a href="http://pelicanthemes.com/">Pelican Themes</a></li>
+                        </ul>
+                </div><!-- /.blogroll -->
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+                            <li><a href="http://ohrho.com/feeds/all.atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                            <li><a href="https://linkedin.com/in/nicholasrrbennett/">my linkedin</a></li>
+                            <li><a href="https://twitter.com/nicksdomainhack">my twitter</a></li>
+                            <li><a href="https://github.com/tothebeat">my github</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="http://getpelican.com/">Pelican</a>, which takes great advantage of <a href="http://python.org">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="http://coding.smashingmagazine.com/2009/08/04/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+</body>
+</html>

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom"><title>ohrho</title><link href="http://ohrho.com/" rel="alternate"></link><link href="http://ohrho.com/feeds/reflection.atom.xml" rel="self"></link><id>http://ohrho.com/</id><updated>2013-11-16T19:09:00-06:00</updated><entry><title>This Is Not A Blog</title><link href="http://ohrho.com/this-is-not-a-blog.html" rel="alternate"></link><updated>2013-11-16T19:09:00-06:00</updated><author><name>Nick Bennett</name></author><id>tag:ohrho.com,2013-11-16:this-is-not-a-blog.html</id><summary type="html">&lt;p&gt;Blogging is hard. Writing well for an audience, making it worth their time to read, is no small task. While I appreciate good writing, this is not my platform for demonstrating my own skills to you. This is not my soap box. I have no interest in convincing you of anything. I don't even really care about expressing my views, because I feel that means I want someone to listen (I don't). Except for my relationships with a very select few people, I know that my opinion has little to no effect on anyone, so I just don't bother wasting the breath.&lt;/p&gt;
+&lt;p&gt;When I write content for this place, such as this article right here, I remind myself that I need not choose something to write about that I think will be interesting to other people. Oh, you do think this is interesting? Well, bloody jolly good! But I don't really care. You think this is boring? Then why are you even reading this? Yes, I will insult my potential reader because I only expect myself to ever read this. Yes, I insult myself constantly.&lt;/p&gt;
+&lt;p&gt;The linear structure of blogs is overly simplistic to me. Perhaps that comes with the meaning of "log". I want this to serve as a growing collection of my thoughts over time, growing both in content as well as structural complexity. I have not seen tags used to organize content in any way that I find satisfying. For the past several years, I have been driven to get better at programming in large part because I want to make that a reality.&lt;/p&gt;
+&lt;p&gt;This is not a soap box. This is just the next step with creative, free-form tools from pen and paper.&lt;/p&gt;</summary><category term="reflection"></category></entry><entry><title>New Challenges</title><link href="http://ohrho.com/new-challenges.html" rel="alternate"></link><updated>2013-11-13T22:20:00-06:00</updated><author><name>Nick Bennett</name></author><id>tag:ohrho.com,2013-11-13:new-challenges.html</id><summary type="html">&lt;p&gt;This is truly a challenge. I must be a masochist. I've set up this blog tonight 
+on my domain &lt;a href="http://ohroh.com"&gt;http://ohroh.com&lt;/a&gt; using my &lt;a href="http://www.webfaction.com"&gt;webfaction&lt;/a&gt; 
+account, using the static blog generator &lt;a href="http://docs.getpelican.com/en/3.3.0/"&gt;Pelican&lt;/a&gt; 
+in a &lt;a href="http://docs.python.org/2/"&gt;Python&lt;/a&gt; &lt;a href="http://docs.python-guide.org/en/latest/dev/virtualenvs/"&gt;virtual environment&lt;/a&gt;. 
+I'm editing this page in the text editor vim, connected to my webfaction account over SSH. 
+No GUI here, which is startling for me since I really like clicking things with a mouse. 
+I do this kind of stuff all day at work, and I've been programming for many years, and 
+still this feels completely foreign to me. &lt;/p&gt;
+&lt;p&gt;I guess that gets to the heart of the matter; it should feel foreign, because I really
+haven't done anything this challenging before. I really find working in the command-line
+interface of Linux to be challenging, especially using the keybindings of vim without
+the arrow keys, but I have shown myself it is possible for me to learn new things. I 
+now use the letters 'hjkl' for left/down/up/right. A year ago, asking me to do that while
+doing something else I've never done before would be like asking me to ride a bicycle
+on the ceiling.&lt;/p&gt;
+&lt;p&gt;I feel very uncomfortable doing these things I'm not familiar with, doing things I feel
+I'm not good at (yet), especially when doing them in public or for pay. And yet I persist,
+doing these things both for pay and ostensibly in public (this, &lt;a href="https://github.com/tothebeat"&gt;github&lt;/a&gt;)
+because I know that life is too short to stick with what's easiest and most comfortable.&lt;/p&gt;</summary><category term="python reflection"></category></entry></feed>

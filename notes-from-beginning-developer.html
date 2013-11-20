@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+        <meta charset="utf-8" />
+        <title>notes from work</title>
+        <link rel="stylesheet" href="http://ohrho.com/theme/css/main.css" />
+        <link href="http://ohrho.com/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="ohrho Atom Feed" />
+
+        <!--[if IE]>
+            <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+</head>
+
+<body id="index" class="home">
+<a href="https://github.com/tothebeat">
+<img style="position: absolute; top: 0; right: 0; border: 0;" src="http://s3.amazonaws.com/github/ribbons/forkme_right_red_aa0000.png" alt="Fork me on GitHub" />
+</a>
+        <header id="banner" class="body">
+                <h1><a href="http://ohrho.com/">ohrho </a></h1>
+                <nav><ul>
+                    <li><a href="http://ohrho.com/category/code.html">Code</a></li>
+                    <li class="active"><a href="http://ohrho.com/category/python.html">Python</a></li>
+                    <li><a href="http://ohrho.com/category/reflection.html">Reflection</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="http://ohrho.com/notes-from-beginning-developer.html" rel="bookmark"
+           title="Permalink to notes from work">notes from work</a></h1>
+    </header>
+
+    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2013-11-19T21:56:00">
+                Tue 19 November 2013
+        </abbr>
+
+        <address class="vcard author">
+                By <a class="url fn" href="http://ohrho.com/author/nick-bennett.html">Nick Bennett</a>
+        </address>
+<p>In <a href="http://ohrho.com/category/python.html">Python</a>. </p>
+<p>tags: <a href="http://ohrho.com/tag/python.html">python</a></p>
+</footer><!-- /.post-info -->      <p>Below is a set of notes I created at work for what I learned and needed to know from the first 4 months of my job. It's all ingrained in my head by now so I rarely look at the page anymore. Perhaps someone out there in Web Land could use it.</p>
+<h3>~/.screenrc</h3>
+<div class="highlight"><pre><span class="n">term</span> <span class="s">&quot;screen-256color&quot;</span>
+<span class="n">startup_message</span> <span class="n">off</span>
+<span class="n">caption</span> <span class="n">string</span> <span class="s">&quot;%?%F%{= Bk}%? %C%A %D %d-%m-%Y %{= kB} %t%= %?%F%{= Bk}%:%{= wk}%? %n &quot;</span>
+<span class="n">hardstatus</span> <span class="n">alwayslastline</span>
+<span class="n">hardstatus</span> <span class="n">string</span> <span class="err">&#39;</span><span class="o">%</span><span class="p">{</span><span class="o">=</span> <span class="n">kG</span><span class="p">}[</span> <span class="o">%</span><span class="p">{</span><span class="n">G</span><span class="p">}</span><span class="o">%</span><span class="n">H</span> <span class="o">%</span><span class="p">{</span><span class="n">g</span><span class="p">}][</span><span class="o">%=</span> <span class="o">%</span><span class="p">{</span><span class="o">=</span> <span class="n">kw</span><span class="p">}</span><span class="o">%?%-</span><span class="n">Lw</span><span class="o">%?%</span><span class="p">{</span><span class="n">r</span><span class="p">}(</span><span class="o">%</span><span class="p">{</span><span class="n">W</span><span class="p">}</span><span class="o">%</span><span class="n">n</span><span class="o">*%</span><span class="n">f</span><span class="o">%</span><span class="n">t</span><span class="o">%?</span><span class="p">(</span><span class="o">%</span><span class="n">u</span><span class="p">)</span><span class="o">%?%</span><span class="p">{</span><span class="n">r</span><span class="p">})</span><span class="o">%</span><span class="p">{</span><span class="n">w</span><span class="p">}</span><span class="o">%?%+</span><span class="n">Lw</span><span class="o">%?%?%=</span> <span class="o">%</span><span class="p">{</span><span class="n">g</span><span class="p">}][</span><span class="o">%</span><span class="p">{</span><span class="n">B</span><span class="p">}</span> <span class="o">%</span><span class="n">d</span><span class="o">/%</span><span class="n">m</span> <span class="o">%</span><span class="p">{</span><span class="n">W</span><span class="p">}</span><span class="o">%</span><span class="n">c</span> <span class="o">%</span><span class="p">{</span><span class="n">g</span><span class="p">}]</span><span class="err">&#39;</span>
+</pre></div>
+
+
+<h3>~/.bashrc</h3>
+<div class="highlight"><pre><span class="c1"># .bashrc</span>
+
+<span class="s-Atom">#</span> <span class="nv">Function</span> <span class="s-Atom">for</span> <span class="s-Atom">randomized</span> <span class="s-Atom">password</span>
+<span class="nf">randpw</span><span class="p">(){</span> <span class="o">&lt;</span> <span class="o">/</span><span class="s-Atom">dev</span><span class="o">/</span><span class="s-Atom">urandom</span> <span class="s-Atom">tr</span> <span class="o">-</span><span class="s-Atom">dc</span> <span class="k">_</span><span class="nv">A</span><span class="o">-</span><span class="nv">Z</span><span class="o">-</span><span class="s-Atom">a</span><span class="o">-</span><span class="s-Atom">z</span><span class="o">-</span><span class="m">0</span><span class="o">-</span><span class="m">9</span> <span class="p">|</span> <span class="s-Atom">head</span> <span class="o">-</span><span class="s-Atom">c$</span><span class="p">{</span><span class="m">1</span><span class="p">:-</span><span class="m">16</span><span class="p">};</span><span class="s-Atom">echo</span><span class="p">;}</span>
+
+<span class="s-Atom">#</span> <span class="nv">Source</span> <span class="s-Atom">global</span> <span class="s-Atom">definitions</span>
+<span class="s-Atom">if</span> <span class="p">[</span> <span class="o">-</span><span class="s-Atom">f</span> <span class="o">/</span><span class="s-Atom">etc</span><span class="o">/</span><span class="s-Atom">bashrc</span> <span class="p">];</span> <span class="s-Atom">then</span>
+        <span class="p">.</span> <span class="o">/</span><span class="s-Atom">etc</span><span class="o">/</span><span class="s-Atom">bashrc</span>
+<span class="s-Atom">fi</span>
+<span class="s-Atom">alias</span> <span class="s-Atom">spotify=&#39;~/bin/my-spotify 2&gt; /dev/null &amp;&#39;</span>
+
+<span class="s-Atom">export</span> <span class="nv">WORKON_HOME</span><span class="s-Atom">=</span><span class="err">$</span><span class="nv">HOME</span><span class="s-Atom">/.virtualenvs</span>
+<span class="s-Atom">export</span> <span class="nv">PROJECT_HOME</span><span class="s-Atom">=</span><span class="err">$</span><span class="nv">HOME</span><span class="o">/</span><span class="nv">Devel</span>
+<span class="s-Atom">source</span> <span class="o">/</span><span class="s-Atom">usr</span><span class="o">/</span><span class="s-Atom">bin</span><span class="o">/</span><span class="s-Atom">virtualenvwrapper</span><span class="p">.</span><span class="s-Atom">sh</span>
+
+<span class="s-Atom">export</span> <span class="nv">PS1</span><span class="s-Atom">=</span><span class="s2">&quot;\[\a\]\[\e[0;31m\]\u@\h {\[\e[1;32m\]\w\[\e[0;31m\]}\n\[\e[0;31m\]$\[\033[0m\]&quot;</span>
+
+<span class="s-Atom">export</span> <span class="nv">PATH</span><span class="s-Atom">=~/</span><span class="nn">bin</span><span class="p">:</span><span class="err">$</span><span class="nv">PATH</span>
+</pre></div>
+
+
+<h2>vim</h2>
+<h3>Remapping Caps-Lock key to CTRL</h3>
+<p>In Gnome in Fedora 18, the Caps-Lock key cannot be remapped to CTRL through the GUI keyboard settings. The remapping is done thusly:</p>
+<div class="highlight"><pre><span class="nv">$ </span>gsettings <span class="nb">set </span>org.gnome.desktop.input-sources xkb-options <span class="s2">&quot;[&#39;ctrl:nocaps&#39;]&quot;</span>
+</pre></div>
+
+
+<p>reference: http://simonbaird.blogspot.com/2013/01/fixing-caps-lock-key-in-gnome-in-fedora.html</p>
+<h3>Shortcuts</h3>
+<p>My vim config: https://github.com/tothebeat/.vim</p>
+<p>Add a space after all commas that don't already have a space after them:</p>
+<div class="highlight"><pre><span class="p">:</span>%<span class="k">s</span><span class="sr">/,\([^ ]\)/</span><span class="p">,</span> \<span class="m">1</span>/<span class="k">g</span>
+</pre></div>
+
+
+<p>Remove trailing whitespace on all lines:</p>
+<div class="highlight"><pre><span class="p">:</span>%<span class="k">s</span><span class="sr">/\s\+$/</span>/<span class="k">g</span>
+</pre></div>
+
+
+<p>Move opening curly braces that appear on their own line to instead appear at the end of the statement on the previous line:</p>
+<div class="highlight"><pre><span class="p">:</span>%<span class="k">s</span><span class="sr">/\n^\s*{/</span> {/<span class="k">g</span>
+</pre></div>
+
+
+<p>Remap the arrow keys to nothing to make myself use hjkl:</p>
+<div class="highlight"><pre><span class="nb">noremap</span> <span class="p">&lt;</span>Up<span class="p">&gt;</span> <span class="p">&lt;</span>Nop<span class="p">&gt;</span>
+<span class="nb">noremap</span> <span class="p">&lt;</span>Down<span class="p">&gt;</span> <span class="p">&lt;</span>Nop<span class="p">&gt;</span>
+<span class="nb">noremap</span> <span class="p">&lt;</span>Left<span class="p">&gt;</span> <span class="p">&lt;</span>Nop<span class="p">&gt;</span>
+<span class="nb">noremap</span> <span class="p">&lt;</span>Right<span class="p">&gt;</span> <span class="p">&lt;</span>Nop<span class="p">&gt;</span>
+</pre></div>
+
+
+<p>reference: http://codingfearlessly.com/2012/08/21/vim-putting-arrows-to-use/</p>
+<h2>screen</h2>
+<ul>
+<li><code>screen -S floop</code> : start a new screen session and name it "floop"</li>
+<li><code>screen -R floop</code> : reconnect to the screen session named "floop"</li>
+<li><code>screen -ls</code> : list current screen sessions</li>
+<li><code>screen -dRR</code> : goddamnit I just want to connect to a screen session</li>
+<li><code>CTRL-a d</code> : detach from the current screen session</li>
+<li><code>CTRL-a c</code> : create a new window with a shell and switch to that window</li>
+<li><code>CTRL-a A</code> : rename the current window</li>
+<li><code>CTRL-a CTRL-a</code> : toggle to the last used screen window (hold in CTRL and tap 'a' twice)</li>
+<li><code>CTRL-a CTRL-n</code> :  switch to the next window</li>
+<li><code>CTRL-a CTRL-p</code> : switch to the previous window</li>
+</ul>
+<h2>MySQL</h2>
+<ul>
+<li>To list tables in database: <code>SHOW TABLES;</code></li>
+<li>To list columns in a table: <code>DESCRIBE table_name;</code></li>
+<li>To show the storage engine being used by a specific table: <code>SELECT ENGINE FROM information_schema.TABLES WHERE TABLE_SCHEMA = 'database_name' AND TABLE_NAME = 'table_name';</code></li>
+<li>To alter a table by adding a column: <code>ALTER TABLE table_name ADD column_name datatype</code></li>
+<li>To alter a table by dropping a column: <code>ALTER TABLE table_name DROP COLUMN column_name</code></li>
+<li>To alter a table by changing the type of an existing column: <code>ALTER TABLE table_name MODIFY column_name datatype</code></li>
+<li>To add a user: <code>CREATE USER 'newuser'@'localhost' IDENTIFIED BY 'password';</code></li>
+<li>To grant permissions to a user:<code>GRANT ALL PRIVILEGES ON databasename.* TO 'newuser'@'localhost'; FLUSH PRIVILEGES;</code></li>
+</ul>
+<h2>Django</h2>
+<ul>
+<li>To show SQL that would be generated for an app:<code>python manage.py sqlall app_name</code></li>
+<li>To open a shell to the database being used by the project:<code>python manage.py dbshell</code></li>
+<li>To open a shell in the context of the project:<code>python manage.py shell</code></li>
+<li>To create a models.py describing the tables already existing in a database:<code>python manage.py inspectdb --database=database_name_in_settings_py &gt; models.py</code></li>
+<li>The database name used is not necessarily the same as that in the database itself. This is the key used in the DATABASES dictionary in settings.py.</li>
+</ul>
+<h2>git</h2>
+<ul>
+<li>Show a log of previous commits, one per line, showing only the commit hash and the message:<code>git log --pretty=oneline</code></li>
+<li>Throw out all local changes and revert the local repository to a previous commit specified by hash:<code>git reset --hard sha1_hash_here</code></li>
+<li>Make a commit of all local changes with a message on the command line (as opposed to the default of spawning an editor):<code>git commit -a -m "Added stuff."</code></li>
+<li>Update local repository with all changes since last update from remote:<code>git pull</code></li>
+<li>Update remote repository with local changes:<code>git push</code></li>
+<li>Show all branches with current branch indicated by an asterisk:<code>git branch</code></li>
+<li>Switch to another branch:<code>git checkout branch_name</code></li>
+<li>Merge all changes from another branch into the current branch:<code>git merge other_branch_name</code></li>
+<li>Create a new branch and check out code to it immediately:<code>git checkout -b new_branch_name</code></li>
+<li>List files changed in a single commit: <code>git show --name-only commit-hash</code></li>
+<li>List files changed between two commits:<code>git diff commit-hash-1 commit-hash-2 --name-only</code></li>
+<li>Stash your changes before you're ready for a commit but need to pull or otherwise merge changes:<code>git stash</code></li>
+<li>Apply your changes again from the stash:<code>git stash apply</code></li>
+</ul>
+<h3>git-rebase</h3>
+<ul>
+<li>Run git log <code>git log --pretty=oneline</code></li>
+<li>Copy hash of commit just before the ones you want to merge. Use it in: <code>git rebase -i hash</code></li>
+<li>Change the more recent commit from 'pick' to 'f', save file</li>
+<li>(optional) If you need to amend your change on Gerrit, <code>git push -f origin HEAD:refs/for/master</code></li>
+</ul>
+<h3>Helpful References</h3>
+<ul>
+<li>http://cheat.errtheblog.com/s/git</li>
+<li>http://rogerdudler.github.io/git-guide/</li>
+<li>http://pcottle.github.io/learnGitBranching/</li>
+<li>https://wiki.openstack.org/wiki/GitCommitMessages</li>
+</ul>
+<h3>password-less ssh login</h3>
+<ul>
+<li>Generate an SSH key pair on your client machine if you have not already done so. <code>ssh-keygen -t rsa</code></li>
+<li>Register this key with the SSH agent.  <code>ssh-add</code></li>
+<li>Copy the id_rsa.pub to the remote host. <code>ssh-copy-id &lt;host&gt;</code></li>
+</ul>
+<h3>Mounting locally using SSHFS</h3>
+<ul>
+<li>Install SSHFS.  <code>sudo yum install fuse-sshfs</code></li>
+<li>Create a mount point.   <code>mkdir -p ~/Documents/Code/xylem-redux/</code></li>
+<li>Mount.  <code>sshfs nbennett@xylem-redux: ~/Documents/Code/xylem-redux/</code></li>
+</ul>
+<h3>Tunnelling MySQL through SSH</h3>
+<p>Forward the MySQL 3306 port on xylem-redux to port 3307 on localhost to use MySQL Workbench more easily. 
+<code>ssh -L 3307:localhost:3306 nbennett@xylem-redux</code></p>
+<h3>Activating Virtual Environment</h3>
+<p>This sets the PATH so that you can use python and pip without having to provide the full path. 
+<code>source pythonenv/bin/activate</code></p>
+<h2>PHP</h2>
+<h3>Debugging</h3>
+<p>To aid debugging in the PHP, throw this at the top of your settings.php file:</p>
+<div class="highlight"><pre><span class="x">//ini_set(&#39;display_errors&#39;, &#39;On&#39;);</span>
+</pre></div>
+
+
+<p>Then just uncomment it when you want to see errors.</p>
+<h3>Setting Up on dev server</h3>
+<h4>Setting Up Apache VirtualHost</h4>
+<p>Apache VirtualHost config files are located in /etc/httpd/vhosts.d/. You should already have a VirtualHost configured for 443/SSL. Add the highlighted lines to your <VirtualHost *:443> section:</p>
+<div class="highlight"><pre><span class="nt">&lt;VirtualHost</span> <span class="err">*:443</span><span class="nt">&gt;</span>
+    ServerName nbennett.xylem-redux.wiredtree.com:443
+    DocumentRoot &quot;/home/nbennett/www/&quot;
+    ServerAdmin nbennett@wiredtree.com
+    ErrorLog logs/nbennett-ssl_error_log
+    LogLevel warn
+    SSLEngine on
+    SSLCipherSuite ALL:!ADH:!EXPORT56:RC4+RSA:+HIGH:+MEDIUM:+LOW:+SSLv2:+EXP
+    SSLCertificateFile /etc/httpd/conf/ssl/server.crt
+    SSLCertificateKeyFile /etc/httpd/conf/ssl/server.key
+    Alias /inventory /home/nbennett/src/wt/inventory/htdocs
+    WSGIScriptAlias /arbor /home/nbennett/src/wt/arbor/arbor/wsgi.py
+    WSGIScriptAlias /creeper /home/nbennett/src/wt/creeper/creeper/wsgi.py
+    WSGIPassAuthorization On
+#     <span class="nt">&lt;Location</span> <span class="nt">/&gt;</span>
+#         Order Deny,Allow
+#         AuthType Basic
+#         AuthName &quot;nbennett.xylem-redux.wiredtree.com&quot;
+#         AuthUserFile /var/www/auth/xylemusers
+#         Require valid-user
+#         SSLRequireSSL
+#     <span class="nt">&lt;/Location&gt;</span>
+<span class="nt">&lt;/VirtualHost&gt;</span>
+</pre></div>
+
+
+<h4>Clone the repository from Gerrit</h4>
+<div class="highlight"><pre><span class="nb">cd</span> ~/src/wt/
+git clone ssh://nbennett@gerrit.wiredtree.com:29418/api/creeper.git
+</pre></div>
+
+
+<h4>Create a virtualenv</h4>
+<div class="highlight"><pre><span class="nb">cd</span> ~/src/wt/creeper/
+virtualenv pythonenv
+<span class="nb">source </span>pythonenv/bin/activate
+pip install -r requirements.txt
+</pre></div>
+
+
+<h2>SAE pack for Pidgin</h2>
+<p>Since sae.tweek.us is no more, you can't get your SAE pack on... unless you get the download here!</p>
+<p>https://github.com/tothebeat/saemoticons/raw/master/SA-Emoticons-Pidgin.tar.gz</p>
+<p>Need a reference on the smilies? </p>
+<p>[http://forums.somethingawful.com/misc.php?action=showsmilies Go to the source]</p>
+<p>[https://github.com/tothebeat/saemoticons Work with the image URLs and emoticon shortcuts scraped from the source]</p>
+    </div><!-- /.entry-content -->
+
+  </article>
+</section>
+        <section id="extras" class="body">
+                <div class="blogroll">
+                        <h2>blogroll</h2>
+                        <ul>
+                            <li><a href="http://news.ycombinator.com/">Hacker News</a></li>
+                            <li><a href="http://lobste.rs/">lobste.rs</a></li>
+                            <li><a href="http://joelonsoftware.com">Joel Spolsky</a></li>
+                            <li><a href="http://sivers.org/">Derek Sivers</a></li>
+                            <li><a href="http://pelicanthemes.com/">Pelican Themes</a></li>
+                        </ul>
+                </div><!-- /.blogroll -->
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+                            <li><a href="http://ohrho.com/feeds/all.atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                            <li><a href="https://linkedin.com/in/nicholasrrbennett/">my linkedin</a></li>
+                            <li><a href="https://twitter.com/nicksdomainhack">my twitter</a></li>
+                            <li><a href="https://github.com/tothebeat">my github</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="http://getpelican.com/">Pelican</a>, which takes great advantage of <a href="http://python.org">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="http://coding.smashingmagazine.com/2009/08/04/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+</body>
+</html>
