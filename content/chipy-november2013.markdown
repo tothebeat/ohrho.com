@@ -12,4 +12,4 @@ All my life, I've gravitated to the bookshelves in a room to run my eyes across 
 
 I took a picture of SpartzInc's bookcase, so I would be able to look at the spines more later. Do other people do this?
 
-![SpartzInc's bookcase](./images/2013-11-14_21.38.13.jpg)
+![SpartzInc's bookcase](images/2013-11-14_21.38.13.jpg)
